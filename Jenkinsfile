@@ -1,14 +1,5 @@
 pipeline {
     agent any
-    tools {
-        go '1.19.4'
-    }
-
-    environment {
-        GO119MODULE = 'on'
-        CGO_ENABLED = 0
-        GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
-    }
 
     stages {
         stage('Initial') {
@@ -21,7 +12,8 @@ pipeline {
         stage('Build') {
             steps {
                     echo 'Compiling and building'
-                    sh 'go build .'
+                    sh 'export GOOS="linux"; go build -o build/app github.com/loupeznik/go-jenkins-example'
+                    sh 'export GOOS="windows"; go build -o build/app.exe github.com/loupeznik/go-jenkins-example'
             }
         }
 
@@ -35,7 +27,7 @@ pipeline {
         stage('Publish') {
             steps {
                 echo 'Publishing to artifact storage'
-                googleStorageUpload bucket: 'gs://cclil-jenkins-tests', credentialsId: 'extended-argon-314215', pattern: '*.exe'
+                googleStorageUpload bucket: 'gs://cclil-jenkins-tests/btc-prices-example-app', credentialsId: 'extended-argon-314215', pathPrefix: 'build/', pattern: 'build/**/*'
             }
         }
     }
