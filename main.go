@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/alexeyco/simpletable"
@@ -14,16 +18,35 @@ var (
 )
 
 func main() {
+	os.Exit(renderResult(os.Stdout))
+}
+
+func renderResult(out io.Writer) int {
+	var arg string
+	days := "30"
+
+	if len(os.Args) > 1 {
+		arg = os.Args[1]
+
+		if _, err := strconv.Atoi(arg); err != nil {
+			fmt.Fprintf(out, "Argument `%s` is not a number", arg)
+			return 1
+		}
+
+		days = arg
+	}
+
 	httpClient := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
 	coingeckoClient := coingecko.NewClient(httpClient)
 
-	chart, err := coingeckoClient.CoinsIDMarketChart("bitcoin", "usd", "30")
+	chart, err := coingeckoClient.CoinsIDMarketChart("bitcoin", "usd", days)
 
 	if err != nil {
-		panic(err)
+		log.Fatal(out, err)
+		return 1
 	}
 
 	for i, v := range *chart.Prices {
@@ -55,5 +78,7 @@ func main() {
 	}
 
 	table.SetStyle(simpletable.StyleRounded)
-	fmt.Println(table.String())
+	fmt.Fprint(out, table.String())
+
+	return 0
 }
