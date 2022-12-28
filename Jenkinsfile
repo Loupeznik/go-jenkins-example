@@ -3,11 +3,15 @@ pipeline {
     tools {
         go 'go'
     }
+
     environment {
         GO119MODULE = 'on'
         CGO_ENABLED = 0
         GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
+
+    def root = tool type: 'go', name: 'go'
+
     stages {
         stage('Initial') {
             steps {
