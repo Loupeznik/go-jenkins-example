@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        go 'go'
+        go '1.19.4'
     }
 
     environment {
@@ -10,33 +10,25 @@ pipeline {
         GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
 
-    def root = tool type: 'go', name: 'go'
-
     stages {
         stage('Initial') {
             steps {
-                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
                     echo 'Installing dependencies'
                     sh 'go get .'
-                }
             }
         }
 
         stage('Build') {
             steps {
-                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
                     echo 'Compiling and building'
                     sh 'go build .'
-                }
             }
         }
 
         stage('Test') {
             steps {
-                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
                     echo 'Running tests'
                     sh 'go test -v'
-                }
             }
         }
 
