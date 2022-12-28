@@ -11,22 +11,28 @@ pipeline {
     stages {
         stage('Initial') {
             steps {
-                echo 'Installing dependencies'
-                sh 'go get .'
+                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
+                    echo 'Installing dependencies'
+                    sh 'go get .'
+                }
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Compiling and building'
-                sh 'go build .'
+                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
+                    echo 'Compiling and building'
+                    sh 'go build .'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests'
-                sh 'go test -v'
+                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin:${HOME}/go/bin"]) {
+                    echo 'Running tests'
+                    sh 'go test -v'
+                }
             }
         }
 
